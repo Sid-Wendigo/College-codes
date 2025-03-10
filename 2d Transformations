@@ -1,0 +1,89 @@
+import numpy as np
+
+def get_transformation_matrix():
+    """Generate a transformation matrix based on user input."""
+    matrix = np.eye(3)
+
+    while True:
+        print("\nSelect a transformation:")
+        print("1. Scaling")
+        print("2. Rotation")
+        print("3. Translation")
+        print("4. Done")
+        choice = input("Enter your choice (1-4): ")
+
+        if choice == '1':
+            sx = float(input("Enter scaling factor for X: "))
+            sy = float(input("Enter scaling factor for Y: "))
+            scale = np.eye(3)
+            scale[0, 0] = sx
+            scale[1, 1] = sy
+            matrix = scale @ matrix
+
+        elif choice == '2':
+            angle = float(input("Enter rotation angle (degrees): "))
+            radians = np.radians(angle)
+            cos_a, sin_a = np.cos(radians), np.sin(radians)
+            rotate = np.eye(3)
+            rotate[0, 0] = cos_a
+            rotate[0, 1] = -sin_a
+            rotate[1, 0] = sin_a
+            rotate[1, 1] = cos_a
+            matrix = rotate @ matrix
+
+        elif choice == '3':
+            tx = float(input("Enter translation on X-axis: "))
+            ty = float(input("Enter translation on Y-axis: "))
+            translate = np.eye(3)
+            translate[0, 2] = tx
+            translate[1, 2] = ty
+            matrix = translate @ matrix
+
+        elif choice == '4':
+            return matrix
+
+        else:
+            print("Invalid choice. Try again.")
+
+def apply_transformation(matrix, points):
+    """Apply the transformation matrix to a list of points."""
+    transformed = []
+    for x, y in points:
+        vector = np.array([x, y, 1])
+        new_point = matrix @ vector
+        transformed.append((new_point[0], new_point[1]))
+    return transformed
+
+def display_points(title, points):
+    """Display the coordinates of points."""
+    print(f"\n{title}")
+    for index, (x, y) in enumerate(points, 1):
+        print(f"Point {index}: ({x:.2f}, {y:.2f})")
+
+def main():
+    shape = input("Transform a point or a triangle? (point/triangle): ").strip().lower()
+
+    if shape == 'triangle':
+        points = []
+        for i in range(3):
+            x = float(input(f"Enter X-coordinate of vertex {i + 1}: "))
+            y = float(input(f"Enter Y-coordinate of vertex {i + 1}: "))
+            points.append((x, y))
+
+    elif shape == 'point':
+        x = float(input("Enter X-coordinate: "))
+        y = float(input("Enter Y-coordinate: "))
+        points = [(x, y)]
+
+    else:
+        print("Invalid shape. Exiting.")
+        return
+
+    transformation_matrix = get_transformation_matrix()
+    transformed_points = apply_transformation(transformation_matrix, points)
+
+    display_points("Original Coordinates:", points)
+    display_points("Transformed Coordinates:", transformed_points)
+
+if __name__ == "__main__":
+    main()
